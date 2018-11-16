@@ -37,14 +37,15 @@
     playerList.on('value',function(snapshot){
       // for each of the first two connections, update their gameState to 'playing'
       snapshot.forEach(function(childSnapshot){
-        var childKey=childSnapshot.key;
-        var childData = childSnapshot.val();
-        database.ref("/connections/"+childKey).update({
+        database.ref("/connections/"+childSnapshot.key).update({
           'gameState':'playing'
         })
       });
     });
   });
+
+  var gameStateRef = database.ref("/connections/"+sessionStorage.getItem('myKey'));
+  console.log("gameStateRef is:"+gameStateRef);
 
   //display the value of the clicked button, and store their selection under their connection key in the database
   $('.buttons').on("click",function(){
