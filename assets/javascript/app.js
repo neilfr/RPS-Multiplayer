@@ -12,91 +12,71 @@
 
   var database=firebase.database();
   var myConnectionRef;
+  var childKey;
+  var childData;
 
-//  var numPlayers=0;
- 
   // location for all connections
-  var connectionsRef = database.ref("/connections"); // fire when 'anyone' connects or disconnects (see line 31)
+  var connectionsRef = database.ref("/connections"); // fires when 'anyone' connects or disconnects (see line 28)
 
   // the special firebase location that is updated when client connection states change
   var connectedRef = database.ref(".info/connected"); //only fires when "i" get connected or disconnected
 
-  // when the connection state changes (connectedRef is the firebase client connection list)
+  // when the connection state changes (connectedRef is the firebase client connection list) only fires when 'i' get connected or disconnected
   connectedRef.on("value", function(snapshot){
         // if they are connected (meaning there is a value in the snapshot... its not null)... the val will be true
       if (snapshot.val()){
           // adds the user to our connections list
-          //  don't need this?  database.ref('/connections');
-          // the 'true' value is irrelevant
+
           var connection=connectionsRef.push(true);
 
           connection.onDisconnect().remove();
-
-
-
-            myConnectionRef=database.ref('/player/'+connection.key);
-            myConnectionRef.set({
-              gameState: 'waiting'
-            });
-            myConnectionRef.onDisconnect().remove();
-
-          sessionStorage.setItem('myKeyPath',myConnectionRef);
-
-          database.ref(myConnectionRef).on('value',function(snapshot){
-
+          connection.set({
+            gameState: 'waiting'
           });
+          sessionStorage.setItem('myKey',connection.key);//store myKey in my session's session storage
 
+    //     database.ref(myConnectionRef).on('value',function(snapshot){
 
+      //    });
 
-
-          
-          
-          
       }
   });
 
-  database.ref("/connections").on('value',(function(snapshot){
-    var numPlayers=snapshot.numChildren();
-    console.log("child count of /connections is:"+numPlayers);
-    sessionStorage.setItem('playerCount',numPlayers);
-  }));
+  //fires everytime there are any changes to the connections list
+  connectionsRef.on('value',function(snapshot){
+    //var numPlayers=snapshot.numChildren();
+ //   console.log("child count of /connections is:"+numPlayers);
+ //   sessionStorage.setItem('playerCount',numPlayers);
+    var playerList=database.ref("/connections").limitToFirst(2);
+    playerList.on('value',function(snapshot){
+      snapshot.forEach(function(childSnapshot){
 
-//  database.ref("/connections").once('value').then(function(snapshot){
-//    sessionStorage.setItem("playerNum",snapshot.numChildren());
-// get playerNum from session storage... if null get a player number... numchildren
-
-/*    var connectionNumber = sessionStorage.getItem('playerNum');
-    $('#playerNumber').html('I am player number:'+connectionNumber);
-    console.log("ARG grabbing from session storage"+connectionNumber);
-    if (connectionNumber<3){
-      $('#gameState').html('I am playing');
-      gameOpen=true;
-    }else{
-      $('#gameState').html('I am locked out');
-      gameOpen=false;
-    }
+        childKey=childSnapshot.key;
+        childData = childSnapshot.val();
+//        var gameState=childData.gameState;
+//        console.log('childKey is:'+childKey);
+//        console.log('childData is:'+childData);
+//        console.log('gameState is:'+gameState);
+        database.ref("/connections/"+childKey).update({
+          'gameState':'playing'
+        })
+      });
+    });
+ //   console.log("playerList is: "+playerList);
   });
-*/
 
-  // when our connections list changes
-/*  connectionsRef.on("value", function(snapshot){
-    numPlayers=snapshot.numChildren();
-    $('#numChildren').html('Number of players is:'+numPlayers);
-  });
-*/
-
-  //display the value of the clicked button
+  //display the value of the clicked button, and store in the database
   $('.buttons').on("click",function(){
         var $element = $(this);
         var selection = $element.attr('value');
         $('#selection').html(selection);
-        database.ref(myConnectionRef).update({
+        database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage
           'selection':selection
         });
 
   });
-
-
+/*
  database.ref('/test').set({
       testValue:'hello world'
   });
+  */
