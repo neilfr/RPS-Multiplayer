@@ -28,6 +28,7 @@
       var connection=connectionsRef.push({
         gameState: 'waiting',
         wins: '0',
+        losses: '0',
         mySelection: 'nothing',
         opponentsSelection: 'nothing'
       });
@@ -54,12 +55,18 @@
             (myPick==='Scissors'&&opponentsPick==='Paper')){
               wins++;
               $('#wins').html("Wins: "+wins);
+      /*        database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage and update the database
+                'wins':wins
+            });*/
           }
           if((myPick==='Rock'&&opponentsPick==='Paper')||
             (myPick==='Paper'&&opponentsPick==='Scissors')||
             (myPick==='Scissors'&&opponentsPick==='Rock')){
               losses++;
               $('#losses').html("Losses: "+losses);
+     /*         database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage and update the database
+                'losses':losses
+              });*/
           }
           
           var $restartBtn=$("<button>");
@@ -181,7 +188,7 @@
     $("#headerMessage").html(""); // clear the old header message
     $('#opponentsSelection').html("");  // clear old opponent selection
     $('#mySelection').html("");  // clear my old selection
-    $('#restartButton').remove();  // remove the old 'Play Again' button
+    $('#restartContainer').empty();  // remove the old 'Play Again' button
     newGame();
   });
  
