@@ -48,22 +48,22 @@
         if(myPick!='nothing'&&opponentsPick!='nothing'){
           //clear old status message
           $('#status').html("");
-          $('#opponentsSelection').html("your opponent picked: "+opponentsPick);
-          if((myPick==='rock'&&opponentsPick==='scissors')||
-            (myPick==='paper'&&opponentsPick==='rock')||
-            (myPick==='scissors'&&opponentsPick==='paper')){
+          $('#opponentsSelection').html("Your opponent picked: "+opponentsPick);
+          if((myPick==='Rock'&&opponentsPick==='Scissors')||
+            (myPick==='Paper'&&opponentsPick==='Rock')||
+            (myPick==='Scissors'&&opponentsPick==='Paper')){
               wins++;
-              $('#wins').html("wins: "+wins);
+              $('#wins').html("Wins: "+wins);
           }
-          if((myPick==='rock'&&opponentsPick==='paper')||
-            (myPick==='paper'&&opponentsPick==='scissors')||
-            (myPick==='scissors'&&opponentsPick==='rock')){
+          if((myPick==='Rock'&&opponentsPick==='Paper')||
+            (myPick==='Paper'&&opponentsPick==='Scissors')||
+            (myPick==='Scissors'&&opponentsPick==='Rock')){
               losses++;
-              $('#losses').html("losses: "+losses);
+              $('#losses').html("Losses: "+losses);
           }
           
           var $restartBtn=$("<button>");
-          $restartBtn.addClass("restartButton");
+          $restartBtn.attr('id','restartButton');
           $restartBtn.attr('value','restart');
           $restartBtn.text('Play Again!');
           $('#restartContainer').append($restartBtn);
@@ -90,7 +90,7 @@
     var playerList=database.ref("/connections").limitToFirst(2);
     playerList.once('value',function(snapshot){
       if(snapshot.numChildren()<2){ // we don't have 2 players yet
-        $('#status').html("waiting for an opponent");
+        $('#status').html("Waiting for an opponent");
         readyForNewGame=false;
         return;
       }
@@ -131,29 +131,31 @@
   //var myGameStateRef=database.ref("/connections/"+sessionStorage.getItem('myKey')+'/gameState');
 
   function drawPlayingScreen(){
+    $("#headerMessage").html("Welcome to the arena!")
     $("#gameContainer").empty();
+    $("#mySelection").html("Select an attack");
     var $rockBtn=$("<button>");
     $rockBtn.addClass("buttons");
-    $rockBtn.attr('value','rock');
-    $rockBtn.text('rock');
+    $rockBtn.attr('value','Rock');
+    $rockBtn.text('Rock');
     var $paperBtn=$("<button>");
     $paperBtn.addClass("buttons");
-    $paperBtn.attr('value','paper');
-    $paperBtn.text('paper');
+    $paperBtn.attr('value','Paper');
+    $paperBtn.text('Paper');
     var $scissorsBtn=$("<button>");
     $scissorsBtn.addClass("buttons");
-    $scissorsBtn.attr('value','scissors');
-    $scissorsBtn.text('scissors');
+    $scissorsBtn.attr('value','Scissors');
+    $scissorsBtn.text('Scissors');
     $('#gameContainer').append($rockBtn);
     $('#gameContainer').append($paperBtn);
     $('#gameContainer').append($scissorsBtn);
-    $('#wins').html("wins: "+wins);
-    $('#losses').html("losses: "+losses);
-    $('#status').html("waiting for your opponent to pick");
+    $('#wins').html("Wins: "+wins);
+    $('#losses').html("Losses: "+losses);
+    $('#status').html("Waiting for your opponent to pick");
   }
 
   function drawWaitingScreen(){
-    $('#gameContainer').html("waiting in the locker room");
+    $('#headerMessage').html("Waiting in the locker room");
   }
 
   //display the value of the clicked button, and store their selection under their connection key in the database
@@ -170,13 +172,16 @@
     });
   });
 
-  $(document).on("click",".restartButton",function(){
+  $(document).on("click","#restartButton",function(){
     database.ref("/connections/"+sessionStorage.getItem('myKey')).update({
       mySelection: 'nothing',
       opponentsSelection: 'nothing',
       gameState:'waiting'
     });
-
+    $("#headerMessage").html(""); // clear the old header message
+    $('#opponentsSelection').html("");  // clear old opponent selection
+    $('#mySelection').html("");  // clear my old selection
+    $('#restartButton').remove();  // remove the old 'Play Again' button
     newGame();
   });
  
