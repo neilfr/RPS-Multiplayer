@@ -24,8 +24,6 @@
       // adds the user to our connections list
       var connection=connectionsRef.push({
         gameState: 'waiting',
-        wins: '0',
-        losses: '0',
         mySelection: 'nothing',
         opponentsSelection: 'nothing'
       });
@@ -46,24 +44,18 @@
         if(myPick!='nothing'&&opponentsPick!='nothing'){
           //clear old status message
           $('#status').html("");
-          $('#opponentsSelection').html("Your opponent picked: "+opponentsPick);
+          $('#opponentsSelection').html("The uther slinger went fur 'is "+opponentsPick);
           if((myPick==='Rock'&&opponentsPick==='Scissors')||
             (myPick==='Paper'&&opponentsPick==='Rock')||
             (myPick==='Scissors'&&opponentsPick==='Paper')){
               wins++;
               $('#wins').html("Wins: "+wins);
-      /*        database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage and update the database
-                'wins':wins
-            });*/
           }
           if((myPick==='Rock'&&opponentsPick==='Paper')||
             (myPick==='Paper'&&opponentsPick==='Scissors')||
             (myPick==='Scissors'&&opponentsPick==='Rock')){
               losses++;
               $('#losses').html("Losses: "+losses);
-     /*         database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage and update the database
-                'losses':losses
-              });*/
           }
           countdown();
         } 
@@ -86,7 +78,7 @@
     var playerList=database.ref("/connections").limitToFirst(2);
     playerList.once('value',function(snapshot){
       if(snapshot.numChildren()<2){ // we don't have 2 players yet
-        $('#status').html("Waiting for an opponent");
+        $('#status').html("Waitin' fur anuther gunslinger!");
         return;
       }
 
@@ -107,21 +99,21 @@
             }else{
               //whichever key, of the first two, isn't mine... must be my opponents... so store it
               sessionStorage.setItem('opponentsKey',childSnapshot.key);
-            } //end if and else
+            } 
             database.ref("/connections/"+childSnapshot.key).update({
               'gameState':'playing',  
               'mySelection': 'nothing',
               'opponentsSelection': 'nothing'
-            });//end database.ref     
+            });  
           }) 
         } 
       }); 
     };
   
   function drawPlayingScreen(){
-    $("#headerMessage").html("Welcome to the arena!")
+    $("#headerMessage").html("Git riddy ta draw!")
     $("#gameContainer").empty();
-    $("#mySelection").html("Select an attack");
+    $("#mySelection").html("Pick 'yer weapon an' shoot!");
     var $rockBtn=$("<button>");
     $rockBtn.addClass("buttons");
     $rockBtn.attr('value','Rock');
@@ -139,12 +131,12 @@
     $('#gameContainer').append($scissorsBtn);
     $('#wins').html("Wins: "+wins);
     $('#losses').html("Losses: "+losses);
-    $('#status').html("Waiting for your opponent to pick");
   }
 
   function drawWaitingScreen(){
     $('#gameContainer').empty();
-    $('#headerMessage').html("Waiting in the locker room");
+ //   $('#headerMessage').html("Waitin' fer anuther gunslinger!");
+    $('#headerMessage').html("");
   }
 
   //display the value of the clicked button, and store their selection under their connection key in the database
@@ -152,7 +144,8 @@
     var $element = $(this);
     var mySelection = $element.attr('value');
     $('.buttons').attr('disabled','disabled');
-    $('#mySelection').html("You picked: "+mySelection);
+    $('#mySelection').html("Ya grabbed yer "+mySelection);
+    $('#status').html("Waitin' fer the uther gunslinger!"); 
     database.ref("/connections/"+sessionStorage.getItem('myKey')).update({  //grab my key from session storage and update the database
       'mySelection':mySelection
     });
@@ -162,9 +155,9 @@
   });
 
 function countdown(){
-  var timer=4;
+  var timer=5;
   myInterval = setInterval(function(){
-      $('#status').html("Next round will start in "+timer+"seconds!");
+      $('#status').html("Next quickdraw in "+timer+" seconds!");
       if(timer===0){
         clearInterval(myInterval);
         database.ref("/connections/"+sessionStorage.getItem('myKey')).update({
