@@ -10,12 +10,9 @@
   firebase.initializeApp(config);
   var database=firebase.database();
  
-  var counter=0;
-  var readyForNewGame;
   var needNewGame;
   var wins=0;
   var losses=0;
-
 
   // the special firebase location that is updated when client connection states change
   var connectedRef = database.ref(".info/connected"); 
@@ -68,15 +65,7 @@
                 'losses':losses
               });*/
           }
-          
-          var $restartBtn=$("<button>");
-          $restartBtn.attr('id','restartButton');
-          $restartBtn.attr('value','restart');
-          $restartBtn.text('Play Again!');
-          $('#restartContainer').append($restartBtn);
-
-        //  snapshot.val().mySelection;
-        //  snapshot.val().opponentsSelection;
+          countdown();
         } 
       });
     }
@@ -98,7 +87,6 @@
     playerList.once('value',function(snapshot){
       if(snapshot.numChildren()<2){ // we don't have 2 players yet
         $('#status').html("Waiting for an opponent");
-        readyForNewGame=false;
         return;
       }
 
@@ -111,10 +99,8 @@
       });
     
       // if we need a new game... reset the game state, mySelection and opponentsSelection
-    //  if(needNewGame&&readyForNewGame){
         if(needNewGame){
-          snapshot.forEach(function(childSnapshot){
-            
+          snapshot.forEach(function(childSnapshot){      
             //check to see if either of the first 2 connections is my connection... and then draw the playing screen
             if(childSnapshot.key===sessionStorage.getItem('myKey')){
               drawPlayingScreen();
@@ -126,17 +112,12 @@
               'gameState':'playing',  
               'mySelection': 'nothing',
               'opponentsSelection': 'nothing'
-            });//end database.ref
-      
-          }) //end foreach
-        } // end if(needNewGame...)
-      }); //end playerList.once
-    };//end function newGame
+            });//end database.ref     
+          }) 
+        } 
+      }); 
+    };
   
-  
-
-  //var myGameStateRef=database.ref("/connections/"+sessionStorage.getItem('myKey')+'/gameState');
-
   function drawPlayingScreen(){
     $("#headerMessage").html("Welcome to the arena!")
     $("#gameContainer").empty();
@@ -162,6 +143,7 @@
   }
 
   function drawWaitingScreen(){
+    $('#gameContainer').empty();
     $('#headerMessage').html("Waiting in the locker room");
   }
 
@@ -179,16 +161,25 @@
     });
   });
 
-  $(document).on("click","#restartButton",function(){
-    database.ref("/connections/"+sessionStorage.getItem('myKey')).update({
-      mySelection: 'nothing',
-      opponentsSelection: 'nothing',
-      gameState:'waiting'
-    });
-    $("#headerMessage").html(""); // clear the old header message
-    $('#opponentsSelection').html("");  // clear old opponent selection
-    $('#mySelection').html("");  // clear my old selection
-    $('#restartContainer').empty();  // remove the old 'Play Again' button
-    newGame();
-  });
- 
+function countdown(){
+  var timer=4;
+  myInterval = setInterval(function(){
+      $('#status').html("Next round will start in "+timer+"seconds!");
+      if(timer===0){
+        clearInterval(myInterval);
+        database.ref("/connections/"+sessionStorage.getItem('myKey')).update({
+          mySelection: 'nothing',
+          opponentsSelection: 'nothing',
+          gameState:'waiting'
+        });
+        $("#headerMessage").html(""); // clear the old header message
+        $('#opponentsSelection').html("");  // clear old opponent selection
+        $('#mySelection').html("");  // clear my old selection
+        $('#restartContainer').empty();  // remove the old 'Play Again' button
+        $('#status').html("");
+        newGame();
+      }else{
+          timer--;
+      }
+  },1000)
+}
