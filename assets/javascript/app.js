@@ -170,9 +170,8 @@ function countdown(){
           gameState:'waiting'
         });
         $("#headerMessage").html(""); // clear the old header message
-        $('#opponentsSelection').html("");  // clear old opponent selection
+        $('#opponentsSelection').html("&nbsp;");  // clear old opponent selection
         $('#mySelection').html("");  // clear my old selection
-        $('#restartContainer').empty();  // remove the old 'Play Again' button
         $('#status').html("");
         newGame();
       }else{
