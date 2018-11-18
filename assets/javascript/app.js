@@ -22,6 +22,8 @@
     // if they are connected (meaning there is a value in the snapshot... its not null)... the val will be true
     if (snapshot.val()){
       // adds the user to our connections list
+      console.log ("waitin in the saloon");
+      $('#waitMessage').html("Waitin' in the saloon fer yer turn!");
       var connection=connectionsRef.push({
         gameState: 'waiting',
         mySelection: 'nothing',
@@ -70,14 +72,15 @@
   connectionsRef.on('child_removed',newGame);
 
   function newGame (snapshot){
-    console.log("trying to start new game");
     // clear out old status message
     $('#status').html("");
+   // $('#waitMessage').html("");
 
     //grab just the first two connections
     var playerList=database.ref("/connections").limitToFirst(2);
     playerList.once('value',function(snapshot){
       if(snapshot.numChildren()<2){ // we don't have 2 players yet
+        $('#waitMessage').html("");
         $('#status').html("Waitin' fur anuther gunslinger!");
         return;
       }
@@ -100,6 +103,7 @@
               //whichever key, of the first two, isn't mine... must be my opponents... so store it
               sessionStorage.setItem('opponentsKey',childSnapshot.key);
             } 
+            $('#waitMessage').html("");
             database.ref("/connections/"+childSnapshot.key).update({
               'gameState':'playing',  
               'mySelection': 'nothing',
